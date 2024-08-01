@@ -1,2 +1,7 @@
 streamlit
 openai
+langchain 
+chromadb
+langchain-community
+tiktoken
+lark
