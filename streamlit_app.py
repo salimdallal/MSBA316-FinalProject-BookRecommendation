@@ -58,7 +58,10 @@ if prompt := st.chat_input("Hello, how can I help you in your book search?"):
     #     stream=True,
     # )
 
-    stream = ChatBackend.getContextualReponse(prompt)
+    #stream = ChatBackend.getContextualReponse(prompt)
+
+    stream = ChatBackend.getSelfQueryReponse(prompt)
+
 
     # Stream the response to the chat using `st.write_stream`, then store it in 
     # session state.

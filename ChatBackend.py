@@ -1,6 +1,3 @@
-# installs
-#pip install -r requirements.txt
-
 
 # Imports
 
@@ -25,12 +22,12 @@ from langchain_chroma import Chroma
 #from langchain.chains import RetrievalQA
 
 from langchain_community.llms import OpenAI
-#from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatOpenAI
 
 #from langchain.prompts import PromptTemplate
 
-#from langchain.retrievers.self_query.base import SelfQueryRetriever
-#from langchain.chains.query_constructor.base import AttributeInfo
+from langchain.retrievers.self_query.base import SelfQueryRetriever
+from langchain.chains.query_constructor.base import AttributeInfo
 
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import LLMChainExtractor
@@ -49,6 +46,29 @@ persist_directory = './chroma_persist'
 
 # load the vector store
 vector_store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
+
+
+
+def create_chat_completion_like_iterable(docs):
+  for doc in docs:
+    message = AIMessage(
+        content=doc.page_content,
+        additional_kwargs={
+            "title": doc.metadata['title'],
+            "author": doc.metadata.get('author'),
+            "category": doc.metadata.get('category'),
+            "rating": doc.metadata.get('average_rating'),
+            "page_count": doc.metadata.get('num_pages'),
+            "rating_count": doc.metadata.get('ratings_count'),
+        }
+    )
+    yield message
+
+
+
+
+
+###############  *******  Contextual Retriever  *********  ################
 
 
 #Create the compressor retreiver that will be used for the chatbot
@@ -72,20 +92,7 @@ def pretty_print_docs(docs):
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
-def create_chat_completion_like_iterable(docs):
-  for doc in docs:
-    message = AIMessage(
-        content=doc.page_content,
-        additional_kwargs={
-            "title": doc.metadata['title'],
-            "author": doc.metadata.get('author'),
-            "category": doc.metadata.get('category'),
-            "rating": doc.metadata.get('average_rating'),
-            "page_count": doc.metadata.get('num_pages'),
-            "rating_count": doc.metadata.get('ratings_count'),
-        }
-    )
-    yield message
+
 
 
 
@@ -101,8 +108,131 @@ def getContextualReponse(question):
     else:
         chat_completion_like_iterable = create_chat_completion_like_iterable(compressed_docs)
         return chat_completion_like_iterable
-
 #    pretty_print_docs(removeDuplicates(compressed_docs))
+
+
+
+
+
+
+
+###############  *******  SelfQuery Retriever  *********  ################
+
+
+
+
+metadata_field_info = [
+    AttributeInfo(
+        name="title",
+        description="The title of the novel from the title metadata",
+        type="string",
+    ),
+        AttributeInfo(
+        name="category",
+        description="The category or subject the novel belongs to",
+        type="string",
+    ),
+        AttributeInfo(
+        name="author",
+        description="The author of the novel",
+        type="string",
+    ),
+        AttributeInfo(
+        name="published_year",
+        description="The year the novel was published",
+        type="integer",
+    ),
+        AttributeInfo(
+        name="average_rating",
+        description="The average rating of the novel by the readers",
+        type="decimal",
+    ),
+        AttributeInfo(
+        name="num_pages",
+        description="The number of pages the novel has",
+        type="integer",
+    ),
+        AttributeInfo(
+        name="ratings_count",
+        description="The number of ratings given by readers for this novel",
+        type="integer",
+    )
+]
+
+document_content_description = "Novel in a library"
+
+Self_llm = ChatOpenAI(model='gpt-4o-mini',temperature=0, openai_api_key=openai_api_key)
+
+retriever = SelfQueryRetriever.from_llm(
+    Self_llm,
+    vector_store,
+    document_content_description,
+    metadata_field_info,
+    verbose=True,
+)
+
+
+
+# Function to get the answer from the ContextualCompressionRetriever 
+def getSelfQueryReponse(question):
+#question = "give me a the highest rating count for stephen king novels"
+    docs = retriever.get_relevant_documents(question)
+    if not docs:
+        print("No results found for your query.")
+        return
+    else:
+        chat_completion_like_iterable = create_chat_completion_like_iterable(docs)
+        return chat_completion_like_iterable
+#    pretty_print_docs(removeDuplicates(compressed_docs))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
