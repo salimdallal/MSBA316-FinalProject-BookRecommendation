@@ -1,12 +1,12 @@
 #!pip install -r requirements.txt
 
 import streamlit as st
-from openai import OpenAI
+#from openai import OpenAI
 
 
 import ChatBackend
 
-openai_api_key = ChatBackend.openai_api_key
+#openai_api_key = st.secrets['OPENAI_API_KEY']
 
 
 # Show title and description.
@@ -26,7 +26,7 @@ st.write(
 # else:
 
 # Create an OpenAI client.
-client = OpenAI(api_key=openai_api_key)
+#client = OpenAI(api_key=openai_api_key)
 
 # Create a session state variable to store the chat messages. This ensures that the
 # messages persist across reruns.

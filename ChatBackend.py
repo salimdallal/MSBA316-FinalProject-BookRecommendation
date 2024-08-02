@@ -37,7 +37,9 @@ from langchain.retrievers.document_compressors import LLMChainExtractor
 
 #import lark
 
-openai_api_key = os.environ.get('OPENAI_API_KEY')
+import streamlit as st
+
+openai_api_key = st.secrets['OPENAI_API_KEY']
 print(f"key = {openai_api_key}")
 
 # Initialize OpenAI embeddings
