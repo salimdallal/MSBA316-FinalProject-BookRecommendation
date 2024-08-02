@@ -3,6 +3,9 @@
 
 
 # Imports
+
+import os
+
 import pandas as pd
 #from langchain.text_splitter import RecursiveCharacterTextSplitter
 
@@ -34,8 +37,8 @@ from langchain.retrievers.document_compressors import LLMChainExtractor
 
 #import lark
 
-openai_api_key = 'sk-proj-fyHj3NNYWfKRB4hd7Y01T3BlbkFJKTGvTtivIKmdueZyX0ga'
-
+openai_api_key = os.environ.get('OPENAI_API_KEY')
+print(f"key = {openai_api_key}")
 
 # Initialize OpenAI embeddings
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)

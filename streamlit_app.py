@@ -2,9 +2,12 @@
 
 import streamlit as st
 from openai import OpenAI
-openai_api_key = 'sk-proj-fyHj3NNYWfKRB4hd7Y01T3BlbkFJKTGvTtivIKmdueZyX0ga'
+
 
 import ChatBackend
+
+openai_api_key = ChatBackend.openai_api_key
+
 
 # Show title and description.
 st.title("💬 Book Recommendation Chatbot\n\nMSBA316 - NLP")
