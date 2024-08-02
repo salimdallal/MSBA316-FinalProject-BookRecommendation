@@ -1,7 +1,12 @@
 streamlit
-openai
-langchain 
-chromadb
+
+langchain-openai
+langchain-chroma
 langchain-community
-tiktoken
-lark
+pysqlite3-binary
+#langchain
+#tiktoken
+#lark
+#sqlite3
+#openai
+#langchain 
