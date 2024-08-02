@@ -52,7 +52,7 @@ vector_store = Chroma(persist_directory=persist_directory, embedding_function=em
 
 
 #Create the compressor retreiver that will be used for the chatbot
-llm = OpenAI(model="gpt-4o-mini", temperature=0, openai_api_key=openai_api_key)
+llm = OpenAI( temperature=0, openai_api_key=openai_api_key) #model="gpt-4o-mini",
 compressor = LLMChainExtractor.from_llm(llm)
 
 compression_retriever = ContextualCompressionRetriever(
@@ -70,16 +70,40 @@ def pretty_print_docs(docs):
     + d.page_content for i, d in enumerate(docs)]))
 
 
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
+
+def create_chat_completion_like_iterable(docs):
+  for doc in docs:
+    message = AIMessage(
+        content=doc.page_content,
+        additional_kwargs={
+            "title": doc.metadata['title'],
+            "author": doc.metadata.get('author'),
+            "category": doc.metadata.get('category'),
+            "rating": doc.metadata.get('average_rating'),
+            "page_count": doc.metadata.get('num_pages'),
+            "rating_count": doc.metadata.get('ratings_count'),
+        }
+    )
+    yield message
+
+
+
+
 
 # Function to get the answer from the ContextualCompressionRetriever 
 def getContextualReponse(question):
 #question = "give me a the highest rating count for stephen king novels"
     compressed_docs = compression_retriever.get_relevant_documents(question)
-
-    pretty_print_docs(removeDuplicates(compressed_docs))
-
     if not compressed_docs:
         print("No results found for your query.")
+        return
+    else:
+        chat_completion_like_iterable = create_chat_completion_like_iterable(compressed_docs)
+        return chat_completion_like_iterable
+
+#    pretty_print_docs(removeDuplicates(compressed_docs))
+
 
 
 def removeDuplicates(compressed_docs):
