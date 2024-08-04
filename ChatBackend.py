@@ -2,6 +2,7 @@
 # Imports
 
 import os
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 
 import pandas as pd
 #from langchain.text_splitter import RecursiveCharacterTextSplitter
